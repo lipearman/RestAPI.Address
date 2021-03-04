@@ -17,10 +17,14 @@ jobs:
         dotnet-version: '3.1.201'
     
     - name: Build Application
-      run: dotnet publish -c Release ./RestAPI.Address/RestAPI.Address.csproj
+      run: dotnet publish -c Release ./RestAPI.Address.sln
 
     - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
+      uses: lipearman/actions-gh-pages@v3
       with:
            github_token: ${{ secrets.GITHUB_TOKEN }}
            publish_dir: ./bin/Release/netstandard3.1/publish/wwwroot/
+           BASE_BRANCH: master
+           BRANCH: gh-pages
+           FOLDER: build/wwwroot
+           CLEAN: true
