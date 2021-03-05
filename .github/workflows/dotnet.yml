@@ -1,26 +1,70 @@
-name: Deploy to Github Pages
-
-on:
-  push:
-    branches: [ master ]
+name: 'Publish application'
+on: push
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+        # Checkout the code
+        - uses: actions/checkout@v2
 
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.201'
-    
-    - name: Build Application
-      run: dotnet publish -c Release ./RestAPI.Address/RestAPI.Address.csproj
+        # Install .NET Core SDKname: 'Publish application'
+on: push
 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-           github_token: ${{ secrets.GITHUB_TOKEN }}
-           publish_dir: ./RestAPI.Address/bin/Release/netstandard3.1/publish/wwwroot/
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        # Checkout the code
+        - uses: actions/checkout@v2
+
+        # Install .NET Core SDK
+        - name: Setup .NET Core
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: 3.1.x
+
+        # Run tests
+        - name: Test
+          run: dotnet test
+
+        # Generate the website
+        - name: Publish
+          run: dotnet publish RestAPI.Address.csproj --configuration Release
+
+        # Publish the website
+        - name: GitHub Pages action
+          if: ${{ github.ref == 'refs/heads/master' }} # Publish only when the push is on master
+          uses: peaceiris/actions-gh-pages@v3.6.1
+          with:
+            github_token: ${{ secrets.PUBLISH_TOKEN }}
+            publish_branch: gh-pages
+            publish_dir: bin/Release/netstandard2.1/publish/wwwroot
+            allow_empty_commit: false
+            keep_files: false
+            force_orphan: true
+
+        - name: Setup .NET Core
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: 3.1.x
+
+        # Run tests
+        - name: Test
+          run: dotnet test
+
+        # Generate the website
+        - name: Publish
+          run: dotnet publish RestAPI.Address.csproj --configuration Release
+
+        # Publish the website
+        - name: GitHub Pages action
+          if: ${{ github.ref == 'refs/heads/master' }} # Publish only when the push is on master
+          uses: peaceiris/actions-gh-pages@v3.6.1
+          with:
+            github_token: ${{ secrets.PUBLISH_TOKEN }}
+            publish_branch: gh-pages
+            publish_dir: bin/Release/netstandard3.1/publish/wwwroot
+            allow_empty_commit: false
+            keep_files: true
+            force_orphan: true
